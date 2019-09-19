@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Internet of Animal Explorer</title>
+
+
+</head>
+
+<body>
+    <div class="container btn-viewer">
+
+        <br>
+
+    </div>
+    <div class="container">
+
+        <form>
+
+            <div class="form-group">
+                <label for="inputField">Add Animal</label>
+                <input  class="form-control" id="animal-add">
+            </div>
+            <button type="submit" class="btn btn-primary addAnimal">Search</button>
+        </form>
+    </div>
+
+
+
+
+    <div class="container gif-viewer">
+
+        <figure class="figure">
+            <img src="${element.images.downsized_still.url}" class="gif" id="dog" data-still="${element.images.downsized_still.url}" data-animate="${element.images.downsized.url}" data-state="still">
+            <figcaption class="figure-caption">${element.rating}</figcaption>
+            </figure>
+    </div>
+
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script type="text/javascript">
+
+        let topicArray = ["dog", "cat", "penguin", "giraffe", "hedgehog", "chicken", "capybara", "lion", "zebra", "bread cat", "pug", "shiba inu", "turtle", "squirrel", "beagle", "fox"];
+
+        const apiKey = "&api_key=G6nZVZgWyoQEXd9fVWSAOLJonIJnEkrX";
+        const query = "https://api.giphy.com/v1/gifs/search?q=";
+        let offset = 10;
+        let lastPressed = "";
+        let queryURL = query + "dog" + apiKey + "&limit=" + offset
+
+        function renderButtons(inArray) {
+
+            $(".btn-viewer").empty();
+
+            inArray.forEach(element => {
+
+                $(".btn-viewer").append(`<button type="button" class="btn btn-primary m-2 topic" data-search = "${element}">${element}</button>`)
+
+            });
+        }
+
+        renderButtons(topicArray);
+
+        $(".addAnimal").on("click", function (event) {
+
+            event.preventDefault();
+            topicArray.push($("#animal-add").val())
+
+            renderButtons(topicArray);
+
+
+        });
+
+
+        $(document.body).on("click", ".topic", function() {
+            lastPressed ===$(this).attr("data-search")? offset+=10 : offset=10;
+            
+            lastPressed =$(this).attr("data-search");
+
+            let queryURL = query + $(this).attr("data-search") + apiKey + "&limit=" + offset;
+            
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+                // After data comes back from the request
+                .then(function (response) {
+
+                    let gifArray = response.data;
+
+                    $(".gif-viewer").empty();
+                  
+                    gifArray.forEach(element => {
+
+                        $(".gif-viewer").append(`
+                        <figure class="figure">
+                        <img src="${element.images.downsized_still.url}" class="gif" id="dog" data-still="${element.images.downsized_still.url}" data-animate="${element.images.downsized.url}" data-state="still">
+                        <figcaption class="figure-caption">${element.rating}</figcaption>
+                        </figure>
+                        `)
+
+                    });
+
+                });
+        });
+        
+      
+        $(document.body).on("click", ".gif", function() {
+             var state = $(this).attr("data-state");
+
+            if (state === "still") {
+                $(this).attr("src", $(this).attr("data-animate"));
+                $(this).attr("data-state", "animate");
+            } else {
+                $(this).attr("src", $(this).attr("data-still"));
+                $(this).attr("data-state", "still");
+            }
+
+
+});
+
+
+    </script>
+
+
+
+</body>
+
+</html>
